@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
-import { getDatabase } from 'firebase/database';  // Importa getDatabase de 'firebase/database'
+import { getFirestore } from 'firebase/firestore';  // Asegúrate de tener esta importación
 import 'firebase/auth';
+
 
 const firebaseConfig = {
     apiKey: "AIzaSyBsup5FQJtDkkJC7NgVVHEEPq1SguNPwyg",
@@ -13,7 +14,8 @@ const firebaseConfig = {
 
 // Verifica si Firebase ya está inicializado antes de hacerlo nuevamente
 const firebaseApp = initializeApp(firebaseConfig);
-const database = getDatabase(firebaseApp);  // Utiliza getDatabase para obtener la instancia de la base de datos
+const firestore = getFirestore(firebaseApp);
+// Utiliza getDatabase para obtener la instancia de la base de datos
 
-export { firebaseApp, database };
+export { firebaseApp, firestore };
 export default firebaseApp;

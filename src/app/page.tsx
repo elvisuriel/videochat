@@ -2,7 +2,7 @@ import React from 'react';
 import { NextPage } from 'next';
 import Head from 'next/head';
 import ChatRoom from './components/ChatRoom';
-
+import 'firebase/app';
 
 const HomePage: NextPage = () => {
   return (
