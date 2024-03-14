@@ -27,7 +27,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ auth, onSignInSuccess }) => {
     return (
         <div className="relative flex justify-center items-center h-screen">
             <div className="absolute bg-cover bg-center inset-0" style={{ backgroundImage: "url('assets/chatt.jpg')" }}></div>
-            <div className="z-10 max-w-lg p-10 border border-gray-700 bg-white text-gray-900 rounded shadow-md bg-opacity-50">
+            <div className="z-10 max-w-lg p-10 border border-gray-700 bg-white text-gray-900 rounded shadow-md bg-opacity-70">
                 <input
                     className="w-full mb-4 px-3 py-2 border border-gray-700 rounded"
                     type="email"
