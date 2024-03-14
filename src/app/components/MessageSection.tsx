@@ -90,7 +90,7 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     placeholder="Escribe tu mensaje..."
-                    className="flex-1 p-2 border border-gray-300 rounded"
+                    className="flex-1 p-2 border border-gray-300 rounded text-black"
                 />
                 <button
                     onClick={handleSendMessage}

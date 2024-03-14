@@ -6,14 +6,19 @@ import 'firebase/app';
 
 const HomePage: NextPage = () => {
   return (
-    <div>
+    <div >
       <Head>
-        <title>Video Chat App</title>
+        <title>Chat App</title>
         <meta name="description" content="Video chat app with WebRTC and Firebase" />
       </Head>
-      <main>
-        <h1>Video Chat App</h1>
-        <ChatRoom />
+      <main >
+        <div className="text-center">
+          <h1 className="text-4xl font-bold " >Chat Qhubo</h1>
+        </div>
+        <div >
+          <ChatRoom />
+        </div>
+
       </main>
     </div>
   );

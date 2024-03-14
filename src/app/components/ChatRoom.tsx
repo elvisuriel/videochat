@@ -43,7 +43,7 @@ const ChatRoom: React.FC = () => {
     };
 
     return (
-        <div>
+        <div className='mx-4 md:mx-0'>
             {user ? (
                 <div>
                     <p>Bienvenido, {user.email}!</p>
