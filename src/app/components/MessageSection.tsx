@@ -68,13 +68,13 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
                 setInputMessage('');
                 onSendMessage(text);
                 setShowClearButton(true);
-                setMessages([...messages, { ...newMessage, id: docRef.id }]);
                 scrollToBottom();
             }
         } catch (error) {
             console.error('Error sending message:', error);
         }
     };
+
 
     const scrollToBottom = () => {
         if (messagesEndRef.current) {
