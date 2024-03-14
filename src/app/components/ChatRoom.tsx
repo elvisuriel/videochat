@@ -6,6 +6,10 @@ import SignInForm from './SignInForm';
 import SignUpForm from './SignUpForm';
 import MessageSection from './MessageSection'; // Asegúrate de importar MessageSection
 
+interface User {
+    uid: string;
+    email: string;
+}
 const ChatRoom: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
     const auth: Auth = getAuth(firebaseApp);
