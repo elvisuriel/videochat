@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     collection,
     onSnapshot,
@@ -27,6 +27,7 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
     const [usersOnline, setUsersOnline] = useState<string[]>([]);
     const [showClearButton, setShowClearButton] = useState<boolean>(false);
     const auth = getAuth();
+    const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const messagesCollection = collection(firestore, 'messages');
 
@@ -40,6 +41,8 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
             const usersOnlineData = snapshot.docs.map((doc) => doc.id);
             setUsersOnline(usersOnlineData);
         });
+
+        scrollToBottom();
 
         return () => {
             unsubscribeMessages();
@@ -66,12 +69,18 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
                 onSendMessage(text);
                 setShowClearButton(true);
                 setMessages([...messages, { ...newMessage, id: docRef.id }]);
+                scrollToBottom();
             }
         } catch (error) {
             console.error('Error sending message:', error);
         }
     };
 
+    const scrollToBottom = () => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
     const handleClearChat = async () => {
         try {
             await Promise.all(messages.map(async (message) => {
@@ -82,7 +91,6 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
             console.error('Error clearing chat:', error);
         }
     };
-
     return (
         <div className="message-section border p-4 mx-4 my-8 max-w-md ">
             <div className="message-list max-h-48 overflow-y-auto">
@@ -91,6 +99,7 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
                         <strong>{message.user}:</strong> {message.text}
                     </div>
                 ))}
+                <div ref={messagesEndRef} />
             </div>
             <div className="user-list mb-4">
                 <h2>Usuarios en línea:</h2>
