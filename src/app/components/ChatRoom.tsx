@@ -43,21 +43,19 @@ const ChatRoom: React.FC = () => {
     };
 
     return (
-        <div>
+        <div className="mx-4 font-bold text-xl text-center">
             {user ? (
                 <div>
-                    <p>Bienvenido, {user.email}!</p>
-                    <button onClick={() => auth.signOut()}>Cerrar Sesión</button>
-                    <div>
+                    <p className="text-lg">¡Bienvenido, {user.email}!</p>
+                    <button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" onClick={() => auth.signOut()}>Cerrar Sesión</button>
+                    <div className="mt-4">
                         <MessageSection onSendMessage={sendMessage} />
                     </div>
                 </div>
             ) : (
                 <div>
-                    <SignInForm auth={auth} onSignInSuccess={function (): void {
-                        throw new Error('Function not implemented.');
-                    }} />
-
+                    <p className="text-lg mb-4">Por favor, inicia sesión para continuar.</p>
+                    <SignInForm auth={auth} onSignInSuccess={() => { }} />
                 </div>
             )}
         </div>

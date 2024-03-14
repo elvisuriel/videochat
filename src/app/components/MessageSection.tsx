@@ -68,7 +68,7 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
     };
 
     return (
-        <div className="message-section border p-4 mx-4 my-8 max-w-md">
+        <div className="message-section border p-4 mx-4 my-8 max-w-md ">
             <div className="message-list max-h-48 overflow-y-auto">
                 {messages.map((message, index) => (
                     <div key={index} className="message mb-2">
