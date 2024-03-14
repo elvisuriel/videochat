@@ -86,6 +86,7 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
             await Promise.all(messages.map(async (message) => {
                 await deleteDoc(doc(messagesCollection, message.id));
             }));
+            setMessages([]); // Limpiar el estado de mensajes después de eliminar todos los mensajes
             setShowClearButton(false);
         } catch (error) {
             console.error('Error clearing chat:', error);
