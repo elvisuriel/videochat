@@ -2,14 +2,16 @@
 import React, { useEffect, useState } from 'react';
 import { firebaseApp, firestore } from '../../../utils/firebase';
 import { getAuth, Auth } from 'firebase/auth';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import SignInForm from './SignInForm';
 import SignUpForm from './SignUpForm';
-import MessageSection from './MessageSection'; // Asegúrate de importar MessageSection
+import MessageSection from './MessageSection';
 
 interface User {
     uid: string;
     email: string;
 }
+
 const ChatRoom: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
     const auth: Auth = getAuth(firebaseApp);
@@ -22,22 +24,13 @@ const ChatRoom: React.FC = () => {
         return () => unsubscribe();
     }, [auth]);
 
-    const handleSignInSuccess = () => {
-        setUser({
-            uid: auth.currentUser?.uid || '',
-            email: auth.currentUser?.email || '',
-        });
-    };
-
     const sendMessage = async (text: string) => {
         try {
             if (text.trim() === '') return;
 
             const currentUser = auth.currentUser;
             if (currentUser) {
-                // Aquí puedes usar Firestore para almacenar el mensaje
-                // Asegúrate de adaptar esto a tu estructura de datos
-                const messagesRef = collection(firestore, 'messages');
+                const messagesRef = collection(firestore, 'messages'); // Importa la función collection
                 await addDoc(messagesRef, {
                     text: text,
                     user: currentUser.email,
@@ -56,16 +49,14 @@ const ChatRoom: React.FC = () => {
                     <p>Bienvenido, {user.email}!</p>
                     <button onClick={() => auth.signOut()}>Cerrar Sesión</button>
                     <div>
-                        {/* Componente para mostrar y enviar mensajes */}
                         <MessageSection onSendMessage={sendMessage} />
                     </div>
                 </div>
             ) : (
                 <div>
-                    {/* Formulario de inicio de sesión */}
-                    <SignInForm auth={auth} onSignInSuccess={handleSignInSuccess} />
-
-                    {/* Formulario de registro */}
+                    <SignInForm auth={auth} onSignInSuccess={function (): void {
+                        throw new Error('Function not implemented.');
+                    }} />
                     <SignUpForm auth={auth} />
                 </div>
             )}
