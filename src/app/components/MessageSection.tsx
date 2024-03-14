@@ -1,4 +1,3 @@
-// components/MessageSection.tsx
 import React, { useState, useEffect } from 'react';
 import {
     collection,
@@ -22,18 +21,27 @@ interface Message {
 const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
     const [inputMessage, setInputMessage] = useState<string>('');
     const [messages, setMessages] = useState<Message[]>([]);
+    const [usersOnline, setUsersOnline] = useState<string[]>([]); // Lista de usuarios en línea
     const auth = getAuth();
 
     const messagesCollection = collection(firestore, 'messages');
 
     useEffect(() => {
-        const unsubscribe = onSnapshot(messagesCollection, (snapshot) => {
+        // Escuchar mensajes
+        const unsubscribeMessages = onSnapshot(messagesCollection, (snapshot) => {
             const messagesData = snapshot.docs.map((doc) => doc.data() as Message);
             setMessages(messagesData);
         });
 
+        // Escuchar usuarios en línea
+        const unsubscribeUsersOnline = onSnapshot(collection(firestore, 'usersOnline'), (snapshot) => {
+            const usersOnlineData = snapshot.docs.map((doc) => doc.id);
+            setUsersOnline(usersOnlineData);
+        });
+
         return () => {
-            unsubscribe();
+            unsubscribeMessages();
+            unsubscribeUsersOnline();
         };
     }, []);
 
@@ -67,6 +75,14 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
                         <strong>{message.user}:</strong> {message.text}
                     </div>
                 ))}
+            </div>
+            <div className="user-list mb-4">
+                <h2>Usuarios en línea:</h2>
+                <ul>
+                    {usersOnline.map((user, index) => (
+                        <li key={index}>{user}</li>
+                    ))}
+                </ul>
             </div>
             <div className="input-section flex mt-4">
                 <input
