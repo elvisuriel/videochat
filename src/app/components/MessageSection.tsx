@@ -26,33 +26,32 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [usersOnline, setUsersOnline] = useState<string[]>([]);
     const [showClearButton, setShowClearButton] = useState<boolean>(false);
+    const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
     const auth = getAuth();
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const messagesCollection = collection(firestore, 'messages');
 
     useEffect(() => {
-        const unsubscribeMessages = onSnapshot(messagesCollection, (snapshot) => {
-            const newMessagesData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Message));
-            const filteredNewMessages = newMessagesData.filter((newMessage) => {
-                return !messages.some((message) => message.id === newMessage.id);
+        if (!isSubscribed) {
+            const unsubscribeMessages = onSnapshot(messagesCollection, (snapshot) => {
+                const messagesData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Message));
+                setMessages(messagesData);
             });
-            setMessages((prevMessages) => [...prevMessages, ...filteredNewMessages]);
-        });
 
-        const unsubscribeUsersOnline = onSnapshot(collection(firestore, 'usersOnline'), (snapshot) => {
-            const usersOnlineData = snapshot.docs.map((doc) => doc.id);
-            setUsersOnline(usersOnlineData);
-        });
+            const unsubscribeUsersOnline = onSnapshot(collection(firestore, 'usersOnline'), (snapshot) => {
+                const usersOnlineData = snapshot.docs.map((doc) => doc.id);
+                setUsersOnline(usersOnlineData);
+            });
 
-        scrollToBottom();
+            setIsSubscribed(true);
 
-        return () => {
-            unsubscribeMessages();
-            unsubscribeUsersOnline();
-        };
-    }, []);
-
+            return () => {
+                unsubscribeMessages();
+                unsubscribeUsersOnline();
+            };
+        }
+    }, [isSubscribed]);
 
     const handleSendMessage = async () => {
         try {
@@ -79,12 +78,12 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
         }
     };
 
-
     const scrollToBottom = () => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     };
+
     const handleClearChat = async () => {
         try {
             await Promise.all(messages.map(async (message) => {
@@ -96,11 +95,12 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
             console.error('Error clearing chat:', error);
         }
     };
+
     return (
         <div className="message-section border p-4 mx-4 my-8 max-w-md ">
             <div className="message-list max-h-48 overflow-y-auto">
-                {messages.map((message, index) => (
-                    <div key={index} className="message mb-2">
+                {messages.map((message) => (
+                    <div key={message.id} className="message mb-2">
                         <strong>{message.user}:</strong> {message.text}
                     </div>
                 ))}
