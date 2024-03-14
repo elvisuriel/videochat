@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Auth, signInWithEmailAndPassword } from 'firebase/auth';
+import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 
 interface SignInFormProps {
     auth: Auth;
@@ -9,10 +9,15 @@ interface SignInFormProps {
 const SignInForm: React.FC<SignInFormProps> = ({ auth, onSignInSuccess }) => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const [isSignInMode, setIsSignInMode] = useState<boolean>(true);
 
     const handleSignIn = async () => {
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            if (isSignInMode) {
+                await signInWithEmailAndPassword(auth, email, password);
+            } else {
+                await createUserWithEmailAndPassword(auth, email, password);
+            }
             onSignInSuccess();
         } catch (error) {
             console.error('Error signing in:', error);
@@ -36,11 +41,14 @@ const SignInForm: React.FC<SignInFormProps> = ({ auth, onSignInSuccess }) => {
                 onChange={(e) => setPassword(e.target.value)}
             />
             <button
-                className="w-full bg-blue-500 text-white py-2 px-4 rounded"
+                className="w-full bg-blue-500 text-white py-2 px-4 rounded mb-4"
                 onClick={handleSignIn}
             >
-                Iniciar Sesión
+                {isSignInMode ? 'Iniciar Sesión' : 'Registrarse'}
             </button>
+            <p className="text-center text-blue-500 cursor-pointer" onClick={() => setIsSignInMode(!isSignInMode)}>
+                {isSignInMode ? '¿No tienes cuenta? Regístrate aquí' : '¿Ya tienes cuenta? Inicia sesión aquí'}
+            </p>
         </div>
     );
 };

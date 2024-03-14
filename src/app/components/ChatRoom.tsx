@@ -57,7 +57,7 @@ const ChatRoom: React.FC = () => {
                     <SignInForm auth={auth} onSignInSuccess={function (): void {
                         throw new Error('Function not implemented.');
                     }} />
-                    <SignUpForm auth={auth} />
+
                 </div>
             )}
         </div>
