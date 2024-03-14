@@ -4,6 +4,8 @@ import {
     onSnapshot,
     addDoc,
     serverTimestamp,
+    deleteDoc,
+    doc
 } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { firestore } from '../../../utils/firebase';
@@ -13,6 +15,7 @@ interface MessageSectionProps {
 }
 
 interface Message {
+    id: string;
     text: string;
     user: string;
     timestamp: any;
@@ -21,19 +24,18 @@ interface Message {
 const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
     const [inputMessage, setInputMessage] = useState<string>('');
     const [messages, setMessages] = useState<Message[]>([]);
-    const [usersOnline, setUsersOnline] = useState<string[]>([]); // Lista de usuarios en línea
+    const [usersOnline, setUsersOnline] = useState<string[]>([]);
+    const [showClearButton, setShowClearButton] = useState<boolean>(false);
     const auth = getAuth();
 
     const messagesCollection = collection(firestore, 'messages');
 
     useEffect(() => {
-        // Escuchar mensajes
         const unsubscribeMessages = onSnapshot(messagesCollection, (snapshot) => {
-            const messagesData = snapshot.docs.map((doc) => doc.data() as Message);
+            const messagesData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Message));
             setMessages(messagesData);
         });
 
-        // Escuchar usuarios en línea
         const unsubscribeUsersOnline = onSnapshot(collection(firestore, 'usersOnline'), (snapshot) => {
             const usersOnlineData = snapshot.docs.map((doc) => doc.id);
             setUsersOnline(usersOnlineData);
@@ -53,17 +55,31 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
             const currentUser = auth.currentUser;
             if (currentUser) {
                 const newMessage: Message = {
+                    id: '',
                     text,
                     user: currentUser.email || '',
                     timestamp: serverTimestamp(),
                 };
 
-                await addDoc(messagesCollection, newMessage);
+                const docRef = await addDoc(messagesCollection, newMessage);
                 setInputMessage('');
                 onSendMessage(text);
+                setShowClearButton(true);
+                setMessages([...messages, { ...newMessage, id: docRef.id }]);
             }
         } catch (error) {
             console.error('Error sending message:', error);
+        }
+    };
+
+    const handleClearChat = async () => {
+        try {
+            await Promise.all(messages.map(async (message) => {
+                await deleteDoc(doc(messagesCollection, message.id));
+            }));
+            setShowClearButton(false);
+        } catch (error) {
+            console.error('Error clearing chat:', error);
         }
     };
 
@@ -84,7 +100,7 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
                     ))}
                 </ul>
             </div>
-            <div className="input-section flex mt-4">
+            <div className="input-section flex flex-col mt-4">
                 <input
                     type="text"
                     value={inputMessage}
@@ -94,11 +110,19 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
                 />
                 <button
                     onClick={handleSendMessage}
-                    className="ml-2 px-4 py-2 bg-blue-500 text-white rounded cursor-pointer"
+                    className="px-4 py-2 bg-blue-500 text-white rounded cursor-pointer mt-2 md:mt-0"
                 >
                     Enviar
                 </button>
             </div>
+            {showClearButton && (
+                <button
+                    onClick={handleClearChat}
+                    className="mt-4 px-4 py-2 bg-red-500 text-white rounded cursor-pointer"
+                >
+                    Vaciar Chat
+                </button>
+            )}
         </div>
     );
 };
