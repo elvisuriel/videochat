@@ -33,8 +33,11 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
 
     useEffect(() => {
         const unsubscribeMessages = onSnapshot(messagesCollection, (snapshot) => {
-            const messagesData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Message));
-            setMessages(messagesData);
+            const newMessagesData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Message));
+            const filteredNewMessages = newMessagesData.filter((newMessage) => {
+                return !messages.some((message) => message.id === newMessage.id);
+            });
+            setMessages((prevMessages) => [...prevMessages, ...filteredNewMessages]);
         });
 
         const unsubscribeUsersOnline = onSnapshot(collection(firestore, 'usersOnline'), (snapshot) => {
@@ -49,6 +52,7 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
             unsubscribeUsersOnline();
         };
     }, []);
+
 
     const handleSendMessage = async () => {
         try {
