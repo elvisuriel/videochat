@@ -15,7 +15,7 @@ interface MessageSectionProps {
 interface Message {
     text: string;
     user: string;
-    timestamp: string;
+    timestamp: any;
 }
 
 const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
