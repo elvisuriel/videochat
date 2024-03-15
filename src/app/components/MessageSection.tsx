@@ -102,7 +102,7 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
                 ))}
                 <div ref={messagesEndRef} />
             </div>
-            <div className="user-list mb-4">
+            <div className="user-list mb-4 text-red-500">
                 <h2>Usuarios en línea:</h2>
                 <ul>
                     {usersOnline.map((user, index) => (
