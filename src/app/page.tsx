@@ -12,7 +12,7 @@ const HomePage: NextPage = () => {
         <meta name="description" content="Video chat app with WebRTC and Firebase" />
       </Head>
       <main >
-        <div className="text-center">
+        <div className="mt-10 text-center">
           <h1 className="text-4xl font-bold " >Q´hubo Chat</h1>
         </div>
         <div >

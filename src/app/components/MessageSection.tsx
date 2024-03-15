@@ -26,32 +26,28 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [usersOnline, setUsersOnline] = useState<string[]>([]);
     const [showClearButton, setShowClearButton] = useState<boolean>(false);
-    const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
     const auth = getAuth();
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const messagesCollection = collection(firestore, 'messages');
 
     useEffect(() => {
-        if (!isSubscribed) {
-            const unsubscribeMessages = onSnapshot(messagesCollection, (snapshot) => {
-                const messagesData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Message));
-                setMessages(messagesData);
-            });
+        const unsubscribeMessages = onSnapshot(messagesCollection, (snapshot) => {
+            const newMessagesData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Message));
+            setMessages(newMessagesData);
+            scrollToBottom();
+        });
 
-            const unsubscribeUsersOnline = onSnapshot(collection(firestore, 'usersOnline'), (snapshot) => {
-                const usersOnlineData = snapshot.docs.map((doc) => doc.id);
-                setUsersOnline(usersOnlineData);
-            });
+        const unsubscribeUsersOnline = onSnapshot(collection(firestore, 'usersOnline'), (snapshot) => {
+            const usersOnlineData = snapshot.docs.map((doc) => doc.id);
+            setUsersOnline(usersOnlineData);
+        });
 
-            setIsSubscribed(true);
-
-            return () => {
-                unsubscribeMessages();
-                unsubscribeUsersOnline();
-            };
-        }
-    }, [isSubscribed]);
+        return () => {
+            unsubscribeMessages();
+            unsubscribeUsersOnline();
+        };
+    }, []);
 
     const handleSendMessage = async () => {
         try {
@@ -67,7 +63,7 @@ const MessageSection: React.FC<MessageSectionProps> = ({ onSendMessage }) => {
                     timestamp: serverTimestamp(),
                 };
 
-                const docRef = await addDoc(messagesCollection, newMessage);
+                await addDoc(messagesCollection, newMessage);
                 setInputMessage('');
                 onSendMessage(text);
                 setShowClearButton(true);
